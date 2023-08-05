@@ -12,8 +12,6 @@ services:
       - "5432:5432"
     volumes:
       - "./db_data_volume:/var/lib/postgresql/data"
-    links:
-      - server
   server:
     build: ./Server
     restart: always
