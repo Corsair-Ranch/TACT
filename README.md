@@ -53,6 +53,17 @@ docker-compose up
 
 - Navigate to the GUI and click the stop button for only the client and server container.
 
+- Make sure you are in the TACT directory then run
+
+```bash
+npm install pm2 -g
+```
+
+> **🗒️ Note :**
+> You may also just run `npm i` if you don't want to install pm2 globally
+
+- If you get permission errors, you may need to use sudo
+
 - Finally run
 
 ```bash
@@ -65,6 +76,10 @@ docker-compose up
 > If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly.
 
 ### If using Docker CLI, run
+
+```bash
+docker-compose down
+```
 
 ```bash
 docker-compose up db
@@ -94,7 +109,7 @@ npm install pm2 -g
 
 ### Start Script Arguments
 
-Arguments you can pass to the start script at the root of the project
+Arguments you can pass to the start script at the root of the project to have the sever build in different ways.
 
 "'default' -> no migrations or seed"
 

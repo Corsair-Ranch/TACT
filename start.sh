@@ -23,16 +23,6 @@ npm install
 cd ..
 cd Server
 npm install
-if [ "$arg1" == "fresh"  ]; then
-  npm run fresh
-elif ["$arg1" == "build"]
-  npm run build
-elif ["$arg1" == "seed"]
-  npm run seed
-else
-  npm run start
-fi
-
 
 cd ..
 
@@ -40,7 +30,16 @@ echo "==========================================================================
 echo "Starting API"
 echo "=========================================================================="
 cd Server
-npx pm2 start npm --name "tact-api" -- start --watch=true
+if [ "$arg1" == "fresh" ]; then
+  npx pm2 start npm --name "tact-api" -- run fresh --watch=true
+elif [ "$arg1" == "build" ]; then
+  npx pm2 start npm --name "tact-api" -- run build --watch=true
+elif [ "$arg1" == "seed" ]; then
+  npx pm2 start npm --name "tact-api" -- run seed --watch=true
+else
+  npx pm2 start npm --name "tact-api" -- start --watch=true
+fi
+
 cd ..
 
 echo "=========================================================================="
@@ -50,5 +49,4 @@ cd Client
 npx pm2 start npm --name "tact-client" -- start --watch=true
 cd ..
 
-npx pm2 ps
 npx pm2 monit
