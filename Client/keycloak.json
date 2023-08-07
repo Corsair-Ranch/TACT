@@ -1,0 +1,8 @@
+{
+  "realm": "tact",
+  "auth-server-url": "http://localhost:8180/realms/tact",
+  "ssl-required": "external",
+  "resource": "tact_client",
+  "public-client": true,
+  "confidential-port": 0
+}

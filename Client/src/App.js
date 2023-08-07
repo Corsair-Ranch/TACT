@@ -8,24 +8,27 @@ import ManageUsers from "./components/ManageUsersPage/ManageUsersPage";
 import DashboardPage from "./pages/DashboardPage";
 import NewExerciseForm from "./components/NewExerciseForm/NewExerciseForm";
 import PlanningTool from "./components/PlanningTool/PlanningTool";
+import PrivateRoute from "./PrivateRoute";
 
 function App() {
-  return (
+    console.log("App");
+
+    return (
     <div className="App">
       <div className="App-header">
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LoginCard />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/Dashboard" element={<PersistentDrawerLeft />}>
-              <Route path="DashboardPage" element={<DashboardPage />} />
-              <Route path="PlanningToolPage" element={<PlanningTool />} />
-              <Route path="EditTablesPage" element={<EditTables />} />
-              <Route path="ManageUsersPage" element={<ManageUsers />} />
-              <Route path="NewExerciseForm" element={<NewExerciseForm />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+          <BrowserRouter>
+            <Routes>
+              <Route exact path="/" element={<PrivateRoute />}></Route>
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/Dashboard" element={<PersistentDrawerLeft />}>
+                <Route path="DashboardPage" element={<DashboardPage />} />
+                <Route path="PlanningToolPage" element={<PlanningTool />} />
+                <Route path="EditTablesPage" element={<EditTables />} />
+                <Route path="ManageUsersPage" element={<ManageUsers />} />
+                <Route path="NewExerciseForm" element={<NewExerciseForm />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
       </div>
     </div>
   );

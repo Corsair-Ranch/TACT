@@ -17,7 +17,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import { DataGrid } from '@mui/x-data-grid';
-import { DataGridPro } from '@mui/x-data-grid-pro';
 
 export default function DashboardPage() {
   const [exerciseList, setExerciseList] = useState([]);

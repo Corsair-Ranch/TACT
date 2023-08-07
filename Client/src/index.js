@@ -9,12 +9,14 @@ import { createTheme } from "@mui/material/styles";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const theme = createTheme();
+
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <AppProvider>
-        <App />
+              <App />
       </AppProvider>
+
     </ThemeProvider>
   </React.StrictMode>
 );
