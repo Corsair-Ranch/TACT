@@ -41,7 +41,7 @@ docker-compose build
 docker-compose up
 ```
 
-- The client will be running on [localhost](http://localhost:3000 "Local port 3000")
+- The client will be running on [localhost](http://localhost:3000 'Local port 3000')
 
 ## Using PM2 for Development
 
@@ -53,28 +53,6 @@ docker-compose up
 
 - Navigate to the GUI and click the stop button for only the client and server container.
 
-- Make sure you are in the TACT directory then run
-
-```bash
-npm install pm2 -g
-```
-
-> **🗒️ Note :**
-> You may also just run `npm i` if you don't want to install pm2 globally
-
-- If you get permission errors, you may need to use sudo
-
-- Finally run
-
-```bash
-./start.sh
-```
-
-- Once the script is finished, there should be a process list in the terminal showing both tact-api and tact-client
-
-> **⚠️ Warning :**
-> If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly.
-
 ### If using Docker CLI, run
 
 ```bash
@@ -85,6 +63,18 @@ docker-compose down
 docker-compose up db
 ```
 
+=======
+- If done properly run
+
+```
+docker ps
+```
+
+- There should only be the postgres container running.
+
+
+### Next,
+
 - Make sure you are in the TACT directory then run
 
 ```bash
@@ -103,6 +93,7 @@ npm install pm2 -g
 ```
 
 - Once the script is finished, there should be a process list in the terminal showing both tact-api and tact-client
+
 
 > **⚠️ Warning :**
 > If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly.
@@ -118,3 +109,6 @@ Arguments you can pass to the start script at the root of the project to have th
 "'build' -> run migrations, no seed"
 
 "'seed' -> run seed, no migrations"
+=======
+> **Warning**
+> If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly, or other server issues.
