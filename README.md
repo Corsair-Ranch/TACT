@@ -33,11 +33,11 @@ Build an automated tool that calculates PACAF O&M dollars per head count for the
 - Make sure the ports 8080, 3000, and 5432 are unassigned
 - Run the following commands
 
-```
+```bash
 docker-compose build
 ```
 
-```
+```bash
 docker-compose up
 ```
 
@@ -53,18 +53,17 @@ docker-compose up
 
 - Navigate to the GUI and click the stop button for only the client and server container.
 
-### ONLY if using Docker CLI, run
+### If using Docker CLI, run
 
+```bash
+docker-compose down
 ```
+
+```bash
 docker-compose up db
 ```
 
-- Then open a new terminal window and run
-
-```
-docker stop tact-server-1
-```
-
+=======
 - If done properly run
 
 ```
@@ -73,23 +72,43 @@ docker ps
 
 - There should only be the postgres container running.
 
+
 ### Next,
 
 - Make sure you are in the TACT directory then run
 
-```
+```bash
 npm install pm2 -g
 ```
+
+> **🗒️ Note :**
+> You may also just run `npm i` if you don't want to install pm2 globally
 
 - If you get permission errors, you may need to use sudo
 
 - Finally run
 
-```
+```bash
 ./start.sh
 ```
 
 - Once the script is finished, there should be a process list in the terminal showing both tact-api and tact-client
 
+
+> **⚠️ Warning :**
+> If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly.
+
+### Start Script Arguments
+
+Arguments you can pass to the start script at the root of the project to have the sever build in different ways.
+
+"'default' -> no migrations or seed"
+
+"'fresh' -> run full migrations and seed"
+
+"'build' -> run migrations, no seed"
+
+"'seed' -> run seed, no migrations"
+=======
 > **Warning**
 > If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly, or other server issues.

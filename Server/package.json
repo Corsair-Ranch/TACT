@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "nodemon ./index.js",
+    "fresh": "nodemon ./index.js build seed",
+    "build": "nodemon ./index.js build",
+    "seed": "nodemon ./index.js seed",
     "test": ""
   },
   "author": "",

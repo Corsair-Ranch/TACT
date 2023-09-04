@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import db from "./db.js";
+import { SERVER_MIGRATION_RETRIES as retries } from "../config.js";
 
 const runMigrations = async (retries, delay) => {
   for (let i = 1; i !== retries; i++) {
@@ -38,7 +39,7 @@ const setTimeoutAsync = (ms) => {
 };
 
 export const buildTables = async () =>
-  await runMigrations(10, 500)
+  await runMigrations(retries, 500)
     .catch((err) => {
       process.exit(1);
     })
@@ -51,7 +52,7 @@ export const buildTables = async () =>
     });
 
 export const seedDb = async () =>
-  await runSeed(10, 500)
+  await runSeed(retries, 500)
     .catch((err) => {
       process.exit(1);
     })
