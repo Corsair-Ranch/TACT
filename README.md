@@ -10,6 +10,7 @@ Updated July 2023
 - Dayan Sauerbronn
 - Roman Morawski
 - Brett Mather
+- Nikki Ghadimi
 
 ## Problem Statement
 
