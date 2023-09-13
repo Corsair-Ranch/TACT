@@ -2,7 +2,7 @@
 
 This project is created for Hack the Ranch May 2023
 
-Updated July 2023
+Updated August 2023
 
 ## Team Members
 
