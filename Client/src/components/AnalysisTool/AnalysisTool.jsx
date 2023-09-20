@@ -654,7 +654,7 @@ function AnalysisTool(props) {
                 <Charts
                 totalsByAirframe={totalsByAirframe}
                 USDollar={USDollar}
-                chartType="bar"
+                chartType="pie"
               />
               </Grid>
 
