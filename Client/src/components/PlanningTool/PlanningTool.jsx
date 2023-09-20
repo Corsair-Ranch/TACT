@@ -5,6 +5,7 @@ import PickAddOns from "./AirfareInfoPg3";
 import Lodging from "./PlanningToolPg4";
 import Thanks from "./PlanningToolPg5";
 import StepInformations from "./StepInformations";
+import RentalCar from './RentalCar'; 
 
 //styles
 import "../../styles/PlanningTool.css";
@@ -164,6 +165,11 @@ function PlanningTool(props) {
       setAircraftData={setAircraftData}
       updateUnitExerciseAircraft={updateUnitExerciseAircraft}
     />,
+    <RentalCar // RentalCar component
+    data={data}
+    updateFileHandler={updateFileHandler}
+    setSaved={setSaved}
+  />,
     <Lodging
       data={data}
       updateFileHandler={updateFileHandler}
@@ -196,6 +202,7 @@ function PlanningTool(props) {
           <div className="step-background">
             <div className="step-bar">
               {arrayInformationsStep.map((step) => (
+
                 <StepInformations
                   key={step.num}
                   array={step}

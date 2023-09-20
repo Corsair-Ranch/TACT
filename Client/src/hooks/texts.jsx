@@ -14,6 +14,10 @@ export function texts() {
             p: 'Decide on how much personnel will be using commercial airfare.'
         },
         {
+            h1: 'Rental Car',
+            p: '..................'
+        },
+        {
             h1: 'Lodging info',
             p: '..................'
         },
@@ -36,12 +40,15 @@ export function texts() {
             num: 3,
             name: 'airfare'
         },
-        {
-            num: 4,
-            name: 'lodging'
+        {   num: 4,
+            name: 'Rental Car'
         },
         {
             num: 5,
+            name: 'lodging'
+        },
+        {
+            num: 6,
             name: 'meals'
         }
     ]

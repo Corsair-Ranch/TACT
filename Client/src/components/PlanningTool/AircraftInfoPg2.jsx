@@ -70,6 +70,7 @@ function YourPlan(props) {
     });
   };
 
+  
   return (
     <div className="form-container">
       <TableContainer component={Paper}>
@@ -87,7 +88,7 @@ function YourPlan(props) {
           </TableHead>
           <TableBody>{rows}</TableBody>
         </Table>
-        <span>
+         <span>
           {/* <Button onClick={handleAddAircraft}>Add Aircraft</Button> */}
           <Button onClick={handleSaveClick}>Save</Button>
           <Typography variant="body1">
@@ -97,6 +98,8 @@ function YourPlan(props) {
       </TableContainer>
     </div>
   );
+
+  
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
