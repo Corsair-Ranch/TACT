@@ -3,7 +3,6 @@ import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
 import {
   Select,
   MenuItem,
@@ -12,17 +11,13 @@ import {
   FormHelperText,
 } from "@mui/material";
 import "chart.js/auto";
-import { Pie, Doughnut } from "react-chartjs-2";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { Button, CardActionArea, CardActions } from "@mui/material";
-import { Bar, ArcElement, CategoryScale } from "react-chartjs-2";
+import { Bar} from "react-chartjs-2";
 import { Divider } from "@mui/material";
-//styles
-//import '../../styles/PlanningTool.css';
 import AnalysisToolStyle from "../../styles/AnalysisToolStyle";
-
+import Charts from "../../components/AnalysisTool/Charts";
 // hooks
 import { useEffect, useState } from "react";
 import TactApi from "../../api/TactApi";
@@ -36,6 +31,11 @@ function AnalysisTool(props) {
   ]);
   const dropdownOptionByFY = "by FY";
   const dropdownOptionByExercise = "by Exercise";
+
+  let USDollar = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
   let totalsByAirframe = [];
 
@@ -67,7 +67,6 @@ function AnalysisTool(props) {
   const queryDropdownByFY = async () => {
     // Call API to populate the second dropdown list.
     const response = await TactApi.getFYs(userEmail);
-    //console.log(response[0])
     setDataOptionsList(response);
     setDataOptionsSelected({ id: 0, value: response[0].value });
   };
@@ -154,75 +153,6 @@ function AnalysisTool(props) {
     j++;
   });
 
-  const options = {
-    responsive: true,
-    cutout: "5%",
-    plugins: {
-      legend: {
-        display: true, // option to enable or disable the legend
-        position: "bottom",
-        // adding label to address the style more specific
-        labels: {
-          font: {
-            size: 16,
-          },
-          color: "rgba(255, 255, 255, 1)",
-          padding: 15,
-        },
-      },
-      title: {
-        display: true,
-        text: `Total FY Spending, per Airframe:`,
-        font: {
-          size: 20,
-          weight: 1, // Font weight is adjusted
-        },
-        color: "rgba(255, 255, 255, 1)", // Color changed to white
-        padding: {
-          // Adding to seperate the Pie chart from the drop down menu
-          bottom: 30,
-          top: 70,
-        },
-      },
-    },
-  };
-
-  const display = {
-    labels: airframeLabels,
-    // labels: ['S12', 'F22', 'G33','T44'], // for testing purposes!
-    datasets: [
-      {
-        label: "$",
-        data: totalsByAirframe,
-        // data: [23, 44, 122, 412,76], // for testing purposes!
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.45)", // from 0.2 to 0.45 to make it more less transparent
-          "rgba(72, 223, 237, 0.45)", //'rgba(54, 162, 235, 0.45)',
-          "rgba(255, 206, 86, 0.45)",
-          "rgba(75, 192, 192, 0.45)",
-          "rgba(153, 102, 255, 0.45)",
-          "rgba(255, 159, 64, 0.45)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(72, 223, 237, 1)", //'rgba(54, 162, 235, 0.45)',
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 2.5, // adjusted to 3 from 1
-      },
-    ],
-  };
-
-  // 'NumberFormat' instanciation to replace the 'CurrencyFormat'
-  let USDollar = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
-
-  // console.log(`The formated version of ${price} is ${USDollar.format(price)}`)
   const displayBarChartsAndReports = () => {
     let dataSetTravelComm = [];
     let dataSetTravelGov = [];
@@ -252,7 +182,6 @@ function AnalysisTool(props) {
               <Grid container alignItems="center">
                 <Grid item xs={7} padding={1}>
                   {" "}
-                  {/*The padding is decreased, and extra small (xs) screen changed from 6 to 7 to increase the bar chart size*/}
                   <Bar
                     data={{
                       labels: costLabels,
@@ -262,15 +191,15 @@ function AnalysisTool(props) {
                           data: dataSetTravelComm,
                           backgroundColor: "rgba(255, 99, 132, 0.45)",
                           borderColor: "rgba(255, 99, 132, 1)",
-                          borderWidth: 2.5, // Border width adjusted
+                          borderWidth: 2.5,
                           stack: "Stack 0",
                         },
                         {
                           label: "Gov't Travel",
                           data: dataSetTravelGov,
-                          backgroundColor: "rgba(72, 223, 237, 0.45)", // Original color -> 'rgba(54, 162, 235, 0.45)',
-                          borderColor: "rgba(72, 223, 237, 1)", //Original color -> 'rgba(54, 162, 235, 1)',
-                          borderWidth: 2.5, // Border width adjusted
+                          backgroundColor: "rgba(72, 223, 237, 0.45)", 
+                          borderColor: "rgba(72, 223, 237, 1)",
+                          borderWidth: 2.5,
                           stack: "Stack 0",
                         },
                         {
@@ -278,7 +207,7 @@ function AnalysisTool(props) {
                           data: dataSetLodging,
                           backgroundColor: "rgba(255, 206, 86, 0.45)",
                           borderColor: "rgba(255, 206, 86, 1)",
-                          borderWidth: 2.5, // Border width adjusted
+                          borderWidth: 2.5,
                           stack: "Stack 1",
                         },
                         {
@@ -286,7 +215,7 @@ function AnalysisTool(props) {
                           data: dataSetMeals,
                           backgroundColor: "rgba(75, 192, 192, 0.45)",
                           borderColor: "rgba(75, 192, 192, 1)",
-                          borderWidth: 2.5, // Border width adjusted
+                          borderWidth: 2.5,
                           stack: "Stack 1",
                         },
                         {
@@ -294,7 +223,7 @@ function AnalysisTool(props) {
                           data: dataSetPerDiem,
                           backgroundColor: "rgba(153, 102, 255, 0.45)",
                           borderColor: "rgba(153, 102, 255, 1)",
-                          borderWidth: 2.5, // Border width adjusted
+                          borderWidth: 2.5,
                           stack: "Stack 1",
                         },
                       ],
@@ -315,25 +244,22 @@ function AnalysisTool(props) {
                             " Pers",
                           font: {
                             size: 20,
-                            weight: 1, // Font weight is adjusted
+                            weight: 1, 
                           },
                           padding: {
-                            // Adding to seperate the Pie chart from the drop down menu
                             bottom: 30,
                           },
-                          color: "rgba(255, 255, 255, 1)", // color changed to 'white'
+                          color: "rgba(255, 255, 255, 1)", 
                         },
 
                         legend: {
-                          display: true, // option to enable or disable the legend
+                          display: true,
                           position: "bottom",
-                          // adding label to address the style more specific
                           labels: {
                             font: {
                               size: 15,
                             },
                             color: "rgba(255, 255, 255, 1)",
-                            // padding:10
                           },
                         },
                         width: 0.1,
@@ -359,8 +285,6 @@ function AnalysisTool(props) {
                           },
                         },
                       },
-
-                      // Bar chart tick and grid color set to white and adjusted their transparency
                       scales: {
                         x: {
                           stacked: true,
@@ -383,16 +307,15 @@ function AnalysisTool(props) {
                       },
                     }}
                   />
+                  
                 </Grid>
                 <Grid item xs={5} padding={3}>
-                  {/* Boarder color changed to 'white' */}
                   <Card
                     sx={AnalysisToolStyle.BarChartCardReport}
                     variant="outlined"
                   >
                     <CardContent>
                       <Grid container>
-                        {/* Add style to cards' title */}
                         <Typography
                           sx={AnalysisToolStyle.TypographyTitleCardReport}
                           gutterBottom
@@ -410,7 +333,6 @@ function AnalysisTool(props) {
 
                         <Grid item {...AnalysisToolStyle.gridItem}>
                           {
-                            /* Added style to Travel Cost */
                             <Typography
                               sx={
                                 AnalysisToolStyle.TypographySubtitleCardReport
@@ -424,8 +346,6 @@ function AnalysisTool(props) {
                               Travel Costs
                             </Typography>
                           }
-
-                          {/*Change the align from 'right' to 'center' for all three Typography below*/}
                           {
                             <Typography
                               gutterBottom
@@ -461,7 +381,6 @@ function AnalysisTool(props) {
                             </Typography>
                           }
                           {
-                            /* Added style to On-Site Cost */
                             <Typography
                               sx={
                                 AnalysisToolStyle.TypographySubtitleCardReport
@@ -475,8 +394,6 @@ function AnalysisTool(props) {
                               On-Site Costs
                             </Typography>
                           }
-
-                          {/*Change the align from 'right' to 'center' for all three Typography below*/}
                           {
                             <Typography
                               gutterBottom
@@ -677,9 +594,7 @@ function AnalysisTool(props) {
       }
     });
   };
-
   // JSX for the two dropdowns.
-  //
   if (totalsByAirframe) {
     return (
       <ThemeProvider theme={theme}>
@@ -734,12 +649,16 @@ function AnalysisTool(props) {
 
             <Grid container alignItems="center" spacing={2}>
               <Grid item {...AnalysisToolStyle.gridItem}>
-                <Pie data={display} options={options} />
+                {/*for the first chart, you can select which type of chart you'd like to display
+                  by changing the 'chartType' value to either "bar" or "pie" */}
+                <Charts
+                totalsByAirframe={totalsByAirframe}
+                USDollar={USDollar}
+                chartType="pie"
+              />
               </Grid>
 
-              <Grid item {...AnalysisToolStyle.gridItem}>
-                {/* The pir chart card report has been adjusted properly to resemble bar report styling*/}
-                <Card
+              <Grid item {...AnalysisToolStyle.gridItem}><Card
                   sx={AnalysisToolStyle.PieChartCardReport}
                   variant="outlined"
                 >
@@ -798,9 +717,7 @@ function AnalysisTool(props) {
                 </Card>
               </Grid>
             </Grid>
-
             {displayBarChartsAndReports()}
-
             <Box sx={AnalysisToolStyle.DividerBox}>
               <Divider variant="fullWidth" />
             </Box>

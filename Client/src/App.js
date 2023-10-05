@@ -12,6 +12,7 @@ import AnalysisTool from "./components/AnalysisTool/AnalysisTool";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import { useState } from "react";
 
+
 function App() {
   const [user, setUser] = useState();
 
