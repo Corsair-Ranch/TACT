@@ -43,11 +43,19 @@ const EditTables = () => {
       airframeList.forEach((entry) => {
         if (name === entry.aircraftName) {
           if (counter === 0) {
-            pain2.push(<TableCell align="left">{name}</TableCell>);
+            pain2.push(
+              <TableCell key={`${name}-${entry.id}`} align="left">
+                {name}
+              </TableCell>
+            );
             counter++;
           }
           if (counter !== entry.aircraftCount) {
-            pain2.push(<TableCell align="center">-</TableCell>);
+            pain2.push(
+              <TableCell key={`dash-${entry.id}`} align="center">
+                -
+              </TableCell>
+            );
             counter++;
           }
           pain2.push(

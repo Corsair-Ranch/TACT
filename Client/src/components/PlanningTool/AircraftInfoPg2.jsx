@@ -6,12 +6,12 @@ import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 // import Paper from "@mui/material/Paper";
-import { Button, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CreateRow from "./CreateRow.jsx";
 // styles
 import "../../styles/PlanningToolPg2.css";
 import { dedupedAircraft } from "./utils.js";
+import { SaveButton } from "./save-button.jsx";
 
 //Pivot on 30 Aug 2023
 // Allowing only one aircraft type to be entered for a specific unit
@@ -19,6 +19,7 @@ import { dedupedAircraft } from "./utils.js";
 function YourPlan(props) {
   const {
     updateFileHandler,
+    saved,
     setSaved,
     aircraftData,
     setAircraftData,
@@ -31,6 +32,8 @@ function YourPlan(props) {
     numOfAircraft: undefined,
     numOfPersonnel: 0,
   });
+  const [localSaved, setLocalSaved] = useState(saved.pg2);
+
   const aircraftLabels = dedupedAircraft(airframeList);
 
   useEffect(() => {
@@ -75,23 +78,25 @@ function YourPlan(props) {
   };
 
   const handleSaveClick = () => {
-    setSaved({ saved: true });
     updateFileHandler({
       personnelSum: aircraftData[0].personnelCount,
     });
+    setSaved({
+      ...saved,
+      alert: "Saving aircraft data ",
+      pg2: true,
+    });
+    setLocalSaved(true);
     updateUnitExerciseAircraft();
   };
 
   return (
     <div className="form-container">
-      {/* <TableContainer component={Paper}> */}
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Airframe Types</StyledTableCell>
-            <StyledTableCell align="center">
-              Number of Airframes
-            </StyledTableCell>
+            <StyledTableCell align="center">Aircraft Type</StyledTableCell>
+            <StyledTableCell align="center">Number of Aircraft</StyledTableCell>
             <StyledTableCell align="center">
               Number of Personnel
             </StyledTableCell>
@@ -106,23 +111,15 @@ function YourPlan(props) {
             getNumberLabels={getNumberLabels}
             setter={setAircraftData}
             rowData={aircraftData[0]}
+            saved={saved}
+            setSaved={setSaved}
+            setLocalSaved={setLocalSaved}
           />
         </TableBody>
       </Table>
       <span>
-        {/* <Button onClick={handleAddAircraft}>Add Aircraft</Button> */}
-        <Button
-          variant="outlined"
-          sx={{ backgroundColor: "white" }}
-          onClick={handleSaveClick}
-        >
-          Save
-        </Button>
-        {/* <Typography variant="body1">
-          Total Personnel: {aircraftData[0].personnelCount}
-        </Typography> */}
+        <SaveButton handleClick={handleSaveClick} saved={localSaved} />
       </span>
-      {/* </TableContainer> */}
     </div>
   );
 }

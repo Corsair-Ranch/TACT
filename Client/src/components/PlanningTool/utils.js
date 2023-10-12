@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export const dedupedAircraft = (list) => {
   const result = [];
   const temp = [];
@@ -25,7 +27,7 @@ export const dedupedAircraft = (list) => {
   return result;
 };
 
-export function calculateUnitCostSum(input) {
+export function calculateUnitCostSum(input, totalDays) {
   // `input` is the unitExerciseAircraft that the cost needs to be determined from
   //will need to do the math on the total cost when saving it here
   //need to cycle through all the fields in the aircraftData and calcuate
@@ -33,18 +35,20 @@ export function calculateUnitCostSum(input) {
   //commercialLodging - done
   //govelodginCost - done
   //rentalCost - done
-  //perDiemTotal ?
+  //perDiemTotal - done
+  //rental car - done
   let result = 0;
   result += input.commercialAirfareCost
     ? input.commercialAirfareCost * input.commercialAirfareCount
     : 0;
   result += input.commercialLodgingCost
-    ? input.commercialLodgingCost * input.commercialLodgingCount
+    ? input.lodgingPerDiem * input.commercialLodgingCount
     : 0;
   result += input.governmentLodgingCost
-    ? input.governmentLodgingCost * input.governmentLodgingCount
+    ? input.lodgingPerDiem * input.governmentLodgingCount
     : 0;
-  result += input.rentalCost ? input.rentalCost * input.rentalCount : 0;
+  result += input.rentalCost ? input.rentalCost : 0;
+  result += input.mealPerDiem * input.mealNotProvidedCount * totalDays;
   return result;
 }
 
@@ -62,5 +66,15 @@ export const convertToCurrency = (input, decimals = 0) => {
   return Math.round(input).toLocaleString(
     currencyParams.locales,
     currencyParams.options
+  );
+};
+
+export const dateToString = (date, formatTemplate = "dd LLL yyyy") => {
+  return DateTime.fromJSDate(date).toLocal().toUTC().toFormat(formatTemplate);
+};
+
+export const calculateTotalDays = (start, stop) => {
+  return Math.round(
+    1 + (new Date(stop) - new Date(start)) / (1000 * 60 * 60 * 24)
   );
 };

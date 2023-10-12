@@ -202,7 +202,6 @@ const updateUnitExercise = async (req, res) => {
     unitCostSum,
   } = req.body;
 
-  console.log("body in update", req.body);
   knex("unitexercises")
     .select("*")
     .where({ exerciseID: exerciseID, unit: unit })

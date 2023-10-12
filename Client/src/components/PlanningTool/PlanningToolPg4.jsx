@@ -2,9 +2,6 @@
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
 import TactApi from "../../api/TactApi";
 import { styled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -14,7 +11,8 @@ import TableRow from "@mui/material/TableRow";
 import "../../styles/PlanningToolPg4.css";
 import { statesObj } from "../Util/states";
 import { Paper, TableContainer, TableHead, Typography } from "@mui/material";
-import { convertToCurrency } from "./utils";
+import { calculateTotalDays, convertToCurrency } from "./utils";
+import { SaveButton } from "./save-button";
 
 //perdiem data = []{
 //   city, ex "Denver / Aurora"
@@ -41,8 +39,8 @@ import { convertToCurrency } from "./utils";
 // }
 
 const getPerDiem = async (params) => {
+  // console.log("params in getPerDiem", params);
   if (params.country === "none") {
-    console.log("None for country");
     return;
   }
 
@@ -55,15 +53,13 @@ const getPerDiem = async (params) => {
     return response;
   } else {
     //get OCONUS perdiems
-    console.log("Getting per diem for outside US");
     const response = await TactApi.getOconus(params);
-    console.log("OCONUS perdiem response", response);
+    // console.log("OCONUS perdiem response", response);
     return response;
   }
 };
 
 const parseOcousPerdiem = (props) => {
-  console.log("parsePerdiem props", props);
   const { raw, perdiemCity } = props;
   const result = { mealPerDiem: 0, lodgingPerDiem: 0, city: "Standard Rate" };
   let temp;
@@ -81,8 +77,7 @@ const parseOcousPerdiem = (props) => {
       }
       if (rate.location === "Standard Rate") standardRate = rate;
     });
-    console.log("temp, standardRate", temp, standardRate);
-    if (temp.location) {
+    if (temp?.location) {
       result.mealPerDiem = temp.mAndI;
       result.lodgingPerDiem = temp.lodging;
       result.city = temp.location;
@@ -92,7 +87,6 @@ const parseOcousPerdiem = (props) => {
       result.city = standardRate.location;
     } else {
       //didn't find the city or standard rate
-      console.log("did not find a city or standard rate for the perdiem");
       result.mealPerDiem = 0;
       result.lodgingPerDiem = 0;
       result.city = "No city found";
@@ -102,7 +96,7 @@ const parseOcousPerdiem = (props) => {
 };
 
 const parsePerdiem = (props) => {
-  console.log("parse perdiem", props);
+  //TODO return all of the results for the perdiem to allow drop down in UI
   const { raw, perdiemCity, perdiemStartMonth, perDiemStopMonth } = props;
   //process the array of results to find the correct city
   const result = { mealPerDiem: 0, lodgingPerDiem: 0, city: "Standard Rate" };
@@ -117,12 +111,7 @@ const parsePerdiem = (props) => {
       return month.number === perDiemStopMonth;
     }).value;
     const hotelPerdiem = (hotelPerdiemStart + hotelPerdiemStop) / 2;
-    console.log(
-      "hotelperdiem with only one array element in raw",
-      perdiemStartMonth,
-      perDiemStopMonth,
-      hotelPerdiem
-    );
+
     result.mealPerDiem = raw[0].meals;
     result.lodgingPerDiem = hotelPerdiem;
     result.city = raw[0].city;
@@ -145,17 +134,10 @@ const parsePerdiem = (props) => {
         return month.number === perDiemStopMonth;
       }).value;
       const hotelPerdiem = (hotelPerdiemStart + hotelPerdiemStop) / 2;
-      console.log(
-        "hotelperdiem with a found city",
-        perdiemStartMonth,
-        perDiemStopMonth,
-        hotelPerdiem
-      );
       result.mealPerDiem = temp.meals;
       result.lodgingPerDiem = hotelPerdiem;
       result.city = temp.city;
     } else if (standardRate?.city && standardRate.meals) {
-      console.log("using the standard rate");
       const hotelPerdiemStart = standardRate.months.month.find((month) => {
         return month.number === perdiemStartMonth;
       }).value;
@@ -168,7 +150,6 @@ const parsePerdiem = (props) => {
       result.city = standardRate.city;
     } else {
       //didn't find the city or standard rate
-      console.log("did not find a city or standard rate for the perdiem");
       result.mealPerDiem = 0;
       result.lodgingPerDiem = 0;
       result.city = "No city found";
@@ -178,8 +159,14 @@ const parsePerdiem = (props) => {
 };
 
 const Lodging = (props) => {
-  const { data, aircraftData, setAircraftData, updateUnitExerciseAircraft } =
-    props;
+  const {
+    data,
+    aircraftData,
+    saved,
+    setSaved,
+    setAircraftData,
+    updateUnitExerciseAircraft,
+  } = props;
   const [startDate, setStartDate] = useState(); // {year, month}
   const [stopDate, setStopDate] = useState(); // {year, month}
   //TODO set location to a default value to process when there is none selected from previous steps
@@ -190,6 +177,19 @@ const Lodging = (props) => {
   const [totalDays, setTotalDays] = useState(0);
   const [comLodgeCost, setComLodgeCost] = useState();
   const [govLodgeCost, setGovLodgeCost] = useState();
+  const [localSaved, setLocalSaved] = useState(saved.pg4);
+
+  const updateSaved = () => {
+    if (saved.pg4 || saved.submitted) {
+      setSaved({
+        ...saved,
+        submitted: false,
+        pg4: false,
+      });
+    }
+
+    setLocalSaved(false);
+  };
 
   useEffect(() => {
     initializeData();
@@ -210,33 +210,7 @@ const Lodging = (props) => {
   }, [comLodgeCost, govLodgeCost]);
 
   const initializeData = () => {
-    if (!aircraftData[0].governmentLodgingCount) {
-      setAircraftData([
-        {
-          ...aircraftData[0],
-          governmentLodgingCount: data.personnelSum,
-          commercialLodgingCount: 0,
-          fieldLodgingCount: 0,
-        },
-      ]);
-    }
-
-    if (!aircraftData[0].mealProvidedCount) {
-      setAircraftData([
-        {
-          ...aircraftData[0],
-          mealProvidedCount: data.personnelSum,
-          mealNotProvidedCount: 0,
-        },
-      ]);
-    }
-
-    setTotalDays(
-      Math.round(
-        (new Date(data.travelEndDate) - new Date(data.travelStartDate)) /
-          (1000 * 60 * 60 * 24)
-      )
-    );
+    setTotalDays(calculateTotalDays(data.travelStartDate, data.travelEndDate));
 
     setStartDate({
       year: parseInt(data.travelStartDate.slice(0, 4)),
@@ -248,9 +222,8 @@ const Lodging = (props) => {
       month: parseInt(data.travelEndDate.slice(5, 7)),
     });
 
-    if (data?.location) {
+    if (data?.locationTo) {
       TactApi.getLocationByIata(data.locationTo).then((result) => {
-        console.log("location To", result);
         setLocation({
           city: result.airport,
           state: result.region,
@@ -266,12 +239,11 @@ const Lodging = (props) => {
     }
 
     calculateCost();
-    console.log("intitial data:", startDate, stopDate, location);
   };
 
   const [perdiemCity, setPerdiemCity] = useState("Not Defined");
+
   useEffect(() => {
-    console.log("prior to getting perdiem", startDate, location);
     if (startDate && location) {
       const params = {
         year: startDate.year,
@@ -311,13 +283,14 @@ const Lodging = (props) => {
         ]);
       });
     } else {
-      console.log("pending getting the perdiem");
     }
     calculateCost();
   }, [startDate, stopDate, location]);
 
   const handleGovLodge = (e) => {
-    const value = parseInt(e.target.value);
+    const value = isNaN(parseInt(e.target.value))
+      ? 0
+      : parseInt(e.target.value);
     if (value > data.personnelSum || value < 0) {
       return;
     } else {
@@ -355,11 +328,13 @@ const Lodging = (props) => {
         },
       ]);
     }
+    updateSaved();
   };
 
   const handleComLodge = (e) => {
-    const value = parseInt(e.target.value);
-    console.log(value);
+    const value = isNaN(parseInt(e.target.value))
+      ? 0
+      : parseInt(e.target.value);
     if (value > data.personnelSum || value < 0) {
       return;
     } else {
@@ -385,11 +360,13 @@ const Lodging = (props) => {
         },
       ]);
     }
+    updateSaved();
   };
 
   const handleFieldLodge = (e) => {
-    const value = parseInt(e.target.value);
-    console.log(value);
+    const value = isNaN(parseInt(e.target.value))
+      ? 0
+      : parseInt(e.target.value);
     if (value > data.personnelSum || value < 0) {
       return;
     } else {
@@ -399,7 +376,6 @@ const Lodging = (props) => {
       let tempCom;
       const checkSum =
         data.personnelSum - value - aircraftData[0].commercialLodgingCount;
-      console.log("checksum", checkSum);
       if (checkSum >= 0) {
         tempGov = checkSum;
         tempCom = aircraftData[0].commercialLodgingCount;
@@ -416,13 +392,13 @@ const Lodging = (props) => {
         },
       ]);
     }
+    updateSaved();
   };
 
   const handleMealsProvided = (e) => {
     const value = isNaN(parseInt(e.target.value))
       ? 0
       : parseInt(e.target.value);
-    console.log(value);
     if (value > data.personnelSum || value < 0) {
       return;
     } else {
@@ -434,6 +410,7 @@ const Lodging = (props) => {
         },
       ]);
     }
+    updateSaved();
   };
 
   const calculateCost = () => {
@@ -457,158 +434,143 @@ const Lodging = (props) => {
     setTotalPerdiemCost(lodging + meals);
   };
 
-  const handleSubmit = () => {
+  const handleSaveClick = () => {
+    setSaved({
+      ...saved,
+      alert: "Saving perdiem ",
+      pg4: true,
+    });
+    setLocalSaved(true);
     updateUnitExerciseAircraft();
   };
 
   const card = (
     <div>
-      <CardContent>
-        <TableContainer component={Paper}>
-          <TableHead>{`Perdiem for ${perdiemCity}`}</TableHead>
-        </TableContainer>
-        <StyledTableRow key="totals-row">
-          <StyledTableCell component="th" scope="row">
-            <Typography>{`Totals`}</Typography>
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Days</Typography>
-
-            <TextField
-              disabled
-              id="numPeopleTotal"
-              // label="Total People"
-              // variant="outlined"
-              margin="normal"
-              value={totalDays}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Personnel</Typography>
-
-            <TextField
-              disabled
-              id="numPeopleTotal"
-              // label="Total People"
-              // variant="outlined"
-              margin="normal"
-              value={data.personnelSum}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Cost</Typography>
-            <TextField
-              disabled
-              id="totalPerdiemCost"
-              // label="Total Perdiem Cost"
-              // variant="filled"
-              margin="normal"
-              value={convertToCurrency(totalPerdiemCost)}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Cost/Person</Typography>
-
-            <TextField
-              disabled
-              id="total-cost-per-person"
-              // label="Meals Total Cost"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(totalPerdiemCost / data.personnelSum)}
-            />
-          </StyledTableCell>
-        </StyledTableRow>
-        <StyledTableRow key="lodging-row">
-          <StyledTableCell component="th" scope="row" />
-
-          <StyledTableCell component="th" scope="row">
-            <Typography>Lodging</Typography>
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Perdiem</Typography>
-            <TextField
-              disabled
-              id="lodgingCost"
-              // label="Lodging Perdiem"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(aircraftData[0].lodgingPerDiem)}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Cost</Typography>
-
-            <TextField
-              disabled
-              id="hotelTotalCost"
-              // label="Lodging Total Cost"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(totalLodgingCost)}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Cost/Person</Typography>
-
-            <TextField
-              disabled
-              id="lodging-cost-per-person"
-              // label="Meals Total Cost"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(totalLodgingCost / data.personnelSum)}
-            />
-          </StyledTableCell>
-        </StyledTableRow>
-        <StyledTableRow key="meal-perdiem-row">
-          <StyledTableCell component="th" scope="row" />
-          <StyledTableCell component="th" scope="row">
-            <Typography>Meals</Typography>
-          </StyledTableCell>
-
-          <StyledTableCell component="th" scope="row">
-            <Typography>Perdiem</Typography>
-
-            <TextField
-              disabled
-              id="mealCost"
-              // label="Meal Perdiem"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(aircraftData[0].mealPerDiem)}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Cost</Typography>
-
-            <TextField
-              disabled
-              id="mealTotalCost"
-              // label="Meals Total Cost"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(totalMealCost)}
-            />
-          </StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-            <Typography>Cost/Person</Typography>
-
-            <TextField
-              disabled
-              id="meals-cost-per-person"
-              // label="Meals Total Cost"
-              variant="outlined"
-              margin="normal"
-              value={convertToCurrency(totalMealCost / data.personnelSum)}
-            />
-          </StyledTableCell>
-        </StyledTableRow>
-      </CardContent>
-      <StyledTableRow key="perdiem-inputs-row">
+      <TableContainer component={Paper}>
+        <TableHead>{`Perdiem for ${perdiemCity}`}</TableHead>
+      </TableContainer>
+      <StyledTableRow key="totals-row">
+        <StyledTableCell component="th" scope="row">
+          <Typography>{`Totals`}</Typography>
+        </StyledTableCell>
         <StyledTableCell component="th" scope="row">
           <TextField
-            // disabled
+            disabled
+            id="numDays"
+            label="Days"
+            margin="normal"
+            value={totalDays}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="numPeopleTotal"
+            label="Personnel"
+            margin="normal"
+            value={data.personnelSum}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="totalPerdiemCost"
+            label="Cost"
+            margin="normal"
+            value={convertToCurrency(totalPerdiemCost)}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="total-cost-per-person"
+            label="Cost/Person"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(totalPerdiemCost / data.personnelSum)}
+          />
+        </StyledTableCell>
+      </StyledTableRow>
+      <StyledTableRow key="lodging-row">
+        <StyledTableCell component="th" scope="row" />
+
+        <StyledTableCell component="th" scope="row">
+          <Typography>Lodging</Typography>
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="lodgingCost"
+            label="Perdiem"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(aircraftData[0].lodgingPerDiem)}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="hotelTotalCost"
+            label="Cost"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(totalLodgingCost)}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="lodging-cost-per-person"
+            label="Cost/Person"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(totalLodgingCost / data.personnelSum)}
+          />
+        </StyledTableCell>
+      </StyledTableRow>
+      <StyledTableRow key="meal-perdiem-row">
+        <StyledTableCell component="th" scope="row" />
+        <StyledTableCell component="th" scope="row">
+          <Typography>Meals</Typography>
+        </StyledTableCell>
+
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="mealCost"
+            label="Perdiem"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(aircraftData[0].mealPerDiem)}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="mealTotalCost"
+            label="Cost"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(totalMealCost)}
+          />
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
+            disabled
+            id="meals-cost-per-person"
+            label="Cost/Person"
+            variant="outlined"
+            margin="normal"
+            value={convertToCurrency(totalMealCost / data.personnelSum)}
+          />
+        </StyledTableCell>
+      </StyledTableRow>
+      <StyledTableRow key="perdiem-inputs-row">
+        <StyledTableCell component="th" scope="row">
+          <Typography>Inputs</Typography>
+        </StyledTableCell>
+        <StyledTableCell component="th" scope="row">
+          <TextField
             id="numGovLodge"
             label="Government Lodging"
             variant="outlined"
@@ -653,12 +615,7 @@ const Lodging = (props) => {
           />
         </StyledTableCell>
       </StyledTableRow>
-
-      <CardActions>
-        <Button onClick={handleSubmit} size="small">
-          Submit
-        </Button>
-      </CardActions>
+      <SaveButton handleClick={handleSaveClick} saved={localSaved} />
     </div>
   );
 

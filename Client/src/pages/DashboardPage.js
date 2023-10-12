@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, useCallback } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { DateTimeAdapter } from "../helper";
 
 import TactApi from "../api/TactApi.js";
@@ -15,55 +15,37 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-
-import { DataGrid } from "@mui/x-data-grid";
-import { DataGridPro } from "@mui/x-data-grid-pro";
+import { convertToCurrency } from "../components/PlanningTool/utils";
+import { calcuateExerciseCost } from "../components/Util/calculate-exercise-cost";
 
 export default function DashboardPage(props) {
   const { user } = props;
   console.log("user in dashboard", user);
   const [exerciseList, setExerciseList] = useState([]);
   const [unitExerciseList, setUnitExerciseList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     TactApi.getDashboard().then((data) => {
       setExerciseList(data);
-      setIsLoading(false);
+      // setIsLoading(false);
     });
 
     TactApi.getAllUnitExercises().then((data) => {
       setUnitExerciseList(data);
-      setIsLoading(false);
+      // setIsLoading(false);
+    });
+
+    calcuateExerciseCost({
+      exercises: exerciseList,
+      unitExercises: unitExerciseList,
     });
   }, []);
 
-  console.log(exerciseList);
-  console.log(unitExerciseList);
-  console.log(isLoading);
-
-  const columns = [
-    {
-      field: "exerciseID",
-      headerName: "ID",
-      headerClassName: "dashboard-table-header",
-      width: 90,
-      editable: false,
-    },
-    {
-      field: "exerciseName",
-      headerName: "Exercise Name",
-      headerClassName: "dashboard-table-header",
-      width: 150,
-      editable: false,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      headerClassName: "dashboard-table-header",
-      width: 150,
-      editable: false,
-    },
-  ];
+  useEffect(() => {
+    calcuateExerciseCost({
+      exercises: exerciseList,
+      unitExercises: unitExerciseList,
+    });
+  }, [exerciseList, unitExerciseList]);
 
   function Row(props) {
     const { row } = props;
@@ -86,12 +68,12 @@ export default function DashboardPage(props) {
           </TableCell>
           <TableCell align="right">{row.userID}</TableCell>
           <TableCell align="right">
-            {DateTimeAdapter.toString(row.exerciseStartDate)}
+            {DateTimeAdapter.toString(row.exerciseStartDate, "dd MMM yyyy")}
           </TableCell>
           <TableCell align="right">
-            {DateTimeAdapter.toString(row.exerciseEndDate)}
+            {DateTimeAdapter.toString(row.exerciseEndDate, "dd MMM yyyy")}
           </TableCell>
-          <TableCell align="right">{row.costSum}</TableCell>
+          <TableCell align="right">{convertToCurrency(row.costSum)}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -118,13 +100,15 @@ export default function DashboardPage(props) {
                               {unitRow.unit}
                             </TableCell>
                             <TableCell>
-                              {DateTimeAdapter.toString(unitRow.dateCreated)}
+                              {DateTimeAdapter.toDate(
+                                new Date(unitRow.dateCreated)
+                              )}
                             </TableCell>
                             <TableCell align="right">
-                              {unitRow.unitCostSum}
+                              {convertToCurrency(unitRow.unitCostSum)}
                             </TableCell>
                             <TableCell align="right">
-                              {unitRow.status}
+                              {unitRow.status ? "Ready" : "Draft"}
                             </TableCell>
                           </TableRow>
                         );
