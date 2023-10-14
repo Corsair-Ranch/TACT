@@ -25,6 +25,7 @@ import GetExerciseAircraftById from "./ExerciseAircraft/get/getExerciseAircraftB
 import getConus from "./PerDiem/get/get-conus.js";
 import getLocationByIata from "./Locations/get/get-location-by-iata.js";
 import getOconus from "./PerDiem/get/get-oconus.js";
+import UpdateExercise from "./exercises/post/UpdateExercise.js";
 
 const TactApi = {
   getDashboard: GetDashboard,
@@ -32,6 +33,7 @@ const TactApi = {
   getAllExercises: GetAllExercises,
   getAllUnitExercises: GetAllUnitExercises,
   postExercises: PostExercises,
+  updateExercise: UpdateExercise,
   getAllAircraft: GetAllAircraft,
   updateAircraft: UpdateAircraft,
   getAllUsers: GetAllUsers,

@@ -4,6 +4,7 @@ import YourPlan from "./AircraftInfoPg2";
 import PickAddOns from "./AirfareInfoPg3";
 import Lodging from "./PlanningToolPg4";
 import Thanks from "./PlanningToolPg5";
+import RentalCar from "./RentalCarPg5";
 import StepInformations from "./StepInformations";
 
 //styles
@@ -14,6 +15,7 @@ import { useEffect, useState } from "react";
 import { texts } from "../../hooks/texts";
 import { useForm } from "../../hooks/useForm";
 import TactApi from "../../api/TactApi";
+import { Summary } from "./SummaryPg6";
 
 // --------- planning layout ------------
 //pg 1 (ex Info) -> drop down with made ex's, user name and unit
@@ -67,10 +69,22 @@ function PlanningTool(props) {
   const [data, setData] = useState(unitExerciseTemplate);
   const [aircraftData, setAircraftData] = useState([unitAircraftTemplate]);
   const [saved, setSaved] = useState({
-    saved: false,
+    submitted: false, //used for setting the data.status in the last page
     alert: "Nothing Selected",
+    pg1: false,
+    pg2: false,
+    pg3: false,
+    pg4: false,
+    pg5: false,
+    pg6: false,
   });
   const [airframeList, setAirframeList] = useState([]);
+
+  useEffect(() => {
+    if (!saved.submitted) {
+      setData({ ...data, status: false });
+    }
+  }, [saved]);
 
   useEffect(() => {
     const fetchInitialInfo = async () => {
@@ -84,7 +98,6 @@ function PlanningTool(props) {
 
   useEffect(() => {
     setUserInfo(user);
-    console.log("user in planning tool", user);
   }, [user]);
 
   useEffect(() => {
@@ -97,7 +110,6 @@ function PlanningTool(props) {
 
   //creates new mission in the DB with 'newMission' as the data obj
   const createUnitExercise = async (newMission) => {
-    setSaved({ saved: true });
     return await TactApi.saveUnitExercise(newMission).then((response) => {
       setData(response);
       return response;
@@ -114,7 +126,6 @@ function PlanningTool(props) {
     await TactApi.updateUnitExercise(data)
       .then((response) => {
         setData(response);
-        setSaved({ saved: true });
       })
       .catch((err) => {
         console.log(err);
@@ -148,7 +159,17 @@ function PlanningTool(props) {
 
   const processOldUnitEx = (input) => {
     setData(input);
-    setSaved({ saved: true });
+    setSaved({
+      ...saved,
+      submitted: input.status,
+      alert: "Using saved exercise info",
+      pg1: input.status,
+      pg2: input.status,
+      pg3: input.status,
+      pg4: input.status,
+      pg5: input.status,
+      pg6: input.status,
+    });
     TactApi.getUnitExerciseAircraftById(input.unitExerciseID).then(
       (response) => {
         if (response && response.length > 0) {
@@ -180,7 +201,6 @@ function PlanningTool(props) {
         console.log(err);
       }
     } else {
-      setSaved({ saved: false, alert: "Saving Inputs" });
       const temp = data;
       Object.keys(update).forEach((obj) => {
         temp[obj] = update[obj];
@@ -188,8 +208,6 @@ function PlanningTool(props) {
       setData(temp);
       if (data.unitExerciseID) {
         updateUnitExercise();
-      } else {
-        setSaved({ saved: false, alert: "Must Select an Exercise" });
       }
     }
   };
@@ -212,6 +230,7 @@ function PlanningTool(props) {
     <ExerciseInfo
       data={data}
       updateFileHandler={updateFileHandler}
+      saved={saved}
       setSaved={setSaved}
       aircraftData={aircraftData}
       setAircraftData={setAircraftData}
@@ -220,6 +239,7 @@ function PlanningTool(props) {
     <YourPlan
       data={data}
       updateFileHandler={updateFileHandler}
+      saved={saved}
       setSaved={setSaved}
       aircraftData={aircraftData}
       setAircraftData={setAircraftData}
@@ -229,6 +249,7 @@ function PlanningTool(props) {
     <PickAddOns
       data={data}
       updateFileHandler={updateFileHandler}
+      saved={saved}
       setSaved={setSaved}
       aircraftData={aircraftData}
       setAircraftData={setAircraftData}
@@ -237,6 +258,25 @@ function PlanningTool(props) {
     <Lodging
       data={data}
       updateFileHandler={updateFileHandler}
+      saved={saved}
+      setSaved={setSaved}
+      aircraftData={aircraftData}
+      setAircraftData={setAircraftData}
+      updateUnitExerciseAircraft={updateUnitExerciseAircraft}
+    />,
+    <RentalCar
+      data={data}
+      updateFileHandler={updateFileHandler}
+      saved={saved}
+      setSaved={setSaved}
+      aircraftData={aircraftData}
+      setAircraftData={setAircraftData}
+      updateUnitExerciseAircraft={updateUnitExerciseAircraft}
+    />,
+    <Summary
+      data={data}
+      updateFileHandler={updateFileHandler}
+      saved={saved}
       setSaved={setSaved}
       aircraftData={aircraftData}
       setAircraftData={setAircraftData}
@@ -315,21 +355,13 @@ function PlanningTool(props) {
                   <span>Next Step</span>
                 </button>
               ) : (
-                <button type="submit" className="btn-confirm">
-                  <span>Confirm</span>
-                </button>
+                <div></div>
               )}
             </div>
           </form>
         </div>
       </main>
 
-      {/* <footer>
-                <p className="attribution">
-                    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>.
-                    Coded by <a href="#">Your Name Here</a>.
-                </p>
-            </footer> */}
       <div className="bottom-space"></div>
     </div>
   );

@@ -88,6 +88,10 @@
 .actions .btn-go-back {
     background: transparent;
     color: var(--cool-gray);
+    background-color: var(--marine-blue);
+    border-radius: .5rem;
+
+    padding: .75rem 1rem;
 }
 
 .actions .btn-next-step {
@@ -120,6 +124,7 @@
 
 .actions .btn-go-back:hover {
     color: var(--marine-blue);
+    background-color: hsl(213, 96%, 30%);
 }
 
 .actions .btn-next-step:hover {
@@ -235,6 +240,9 @@
         position: inherit;
         transition: all .2s linear;
         padding: 0;
+    }
+    .actions .btn-go-back {
+        padding: 1rem 1.8rem;
     }
 
     .actions .btn-next-step {

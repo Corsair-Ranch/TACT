@@ -14,7 +14,21 @@ const CreateRow = (props) => {
     getNumberLabels,
     setter,
     rowData,
+    saved,
+    setSaved,
+    setLocalSaved,
   } = props;
+
+  const updateSaved = () => {
+    if (saved.pg2 || saved.submitted) {
+      setSaved({
+        ...saved,
+        submitted: false,
+        pg2: false,
+      });
+    }
+    setLocalSaved(false);
+  };
 
   const handleAircraftSelect = (e) => {
     setNumberLabels(getNumberLabels(e.numbers));
@@ -26,6 +40,7 @@ const CreateRow = (props) => {
         personnelCount: 0,
       },
     ]);
+    updateSaved();
   };
 
   const handleNumberAircraftSelect = (e) => {
@@ -46,6 +61,7 @@ const CreateRow = (props) => {
           e.number - rowData.commercialLodgingCount - rowData.fieldLodgingCount,
       },
     ]);
+    updateSaved();
   };
 
   const handlePersonnelChange = (e) => {
@@ -58,7 +74,6 @@ const CreateRow = (props) => {
         ? value
         : rowData.mealNotProvidedCount;
     //to the parent component
-    console.log("mealsDif", mealsDif, rowData.mealNotProvidedCount);
     setter([
       {
         ...rowData,
@@ -70,6 +85,7 @@ const CreateRow = (props) => {
           value - rowData.commercialLodgingCount - rowData.fieldLodgingCount,
       },
     ]);
+    updateSaved();
   };
 
   return (

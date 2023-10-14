@@ -55,7 +55,6 @@ const ActionObjectGeneral = [
 
 const UserActionItems = (props) => {
   const { userInfo } = props;
-  console.log("userInfo", userInfo);
   if (userInfo === undefined) {
     return (
       <>

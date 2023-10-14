@@ -8,6 +8,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 // styles
 import "../../styles/PlanningToolPg1.css";
 import { LocationField } from "./location-field";
+import { SaveButton } from "./save-button";
 
 const defaultLabelValues = {
   exerciseLabels: [{ value: undefined, label: "Select Exercise" }],
@@ -25,9 +26,28 @@ const generateExerciseLabels = (input) => {
 };
 
 function YourInfo(props) {
-  const { data, updateFileHandler, aircraftData, setAircraftData, exercises } =
-    props;
+  const {
+    data,
+    updateFileHandler,
+    saved,
+    setSaved,
+    aircraftData,
+    setAircraftData,
+    exercises,
+  } = props;
   const [defaultExerciseValue, setDefaultExerciseValue] = useState();
+  const [localSaved, setLocalSaved] = useState(saved.pg1);
+
+  const updateSaved = () => {
+    if (saved.pg1 || saved.submitted) {
+      setSaved({
+        ...saved,
+        submitted: false,
+        pg1: false,
+      });
+    }
+    setLocalSaved(false);
+  };
 
   const exerciseLabels = generateExerciseLabels(exercises);
 
@@ -48,6 +68,7 @@ function YourInfo(props) {
 
   const verifyExerciseInputs = (e) => {
     updateFileHandler({ exerciseID: e.value });
+    updateSaved();
   };
 
   const resetCommercialAirfareCost = () => {
@@ -61,23 +82,35 @@ function YourInfo(props) {
   const verifyStartDateInputs = (e) => {
     updateFileHandler({ travelStartDate: e.$d });
     resetCommercialAirfareCost();
+    updateSaved();
   };
 
   const verifyEndDateInputs = (e) => {
     updateFileHandler({ travelEndDate: e.$d });
     resetCommercialAirfareCost();
+    updateSaved();
   };
 
   const changeDepartLocation = (e) => {
     updateFileHandler({ locationFrom: e.value });
     resetCommercialAirfareCost();
+    updateSaved();
   };
 
   const changeDestinationLocation = (e) => {
     updateFileHandler({ locationTo: e.value });
     resetCommercialAirfareCost();
+    updateSaved();
   };
 
+  const handleSaveClick = () => {
+    setSaved({
+      ...saved,
+      alert: "Saving Exercise Data ",
+      pg1: true,
+    });
+    setLocalSaved(true);
+  };
   return (
     <div className="form-container">
       <div className="input-container">
@@ -137,6 +170,9 @@ function YourInfo(props) {
         onChange={changeDestinationLocation}
         locationId={data.locationTo}
       />
+      <span>
+        <SaveButton handleClick={handleSaveClick} saved={localSaved} />
+      </span>
     </div>
   );
 }
