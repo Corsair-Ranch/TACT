@@ -78,3 +78,12 @@ export const calculateTotalDays = (start, stop) => {
     1 + (new Date(stop) - new Date(start)) / (1000 * 60 * 60 * 24)
   );
 };
+
+export const convertToNumber = (input, type = "integer") => {
+  let result = input;
+  if (typeof input !== "number") {
+    if (type === "integer") result = parseInt(input);
+    if (type === "float") result = parseFloat(input);
+  }
+  return result;
+};
