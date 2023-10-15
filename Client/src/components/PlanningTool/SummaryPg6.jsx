@@ -38,9 +38,7 @@ export function Summary(props) {
     typeOfAircraft: aircraftData[0].aircraftType,
     numOfAircraft: aircraftData[0].aircraftCount,
     numOfPersonnel: aircraftData[0].personnelCount,
-    commercialAirCost:
-      aircraftData[0].commercialAirfareCost *
-      aircraftData[0].commercialAirfareCount,
+    commercialAirCost: aircraftData[0].commercialAirfareCost,
     lodgingCost:
       aircraftData[0].commercialLodgingCost +
       aircraftData[0].governmentLodgingCost,
