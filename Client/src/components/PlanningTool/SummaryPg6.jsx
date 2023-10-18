@@ -7,7 +7,12 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import React, { useState, useEffect } from "react";
-import { calculateTotalDays, convertToCurrency, dateToString } from "./utils";
+import {
+  calculateTotalDays,
+  convertToCurrency,
+  convertToNumber,
+  dateToString,
+} from "./utils";
 import TactApi from "../../api/TactApi";
 import { SubmitButton } from "./save-button";
 
@@ -36,20 +41,22 @@ export function Summary(props) {
     startDate: dateToString(new Date(data.travelStartDate)),
     stopDate: dateToString(new Date(data.travelEndDate)),
     typeOfAircraft: aircraftData[0].aircraftType,
-    numOfAircraft: aircraftData[0].aircraftCount,
-    numOfPersonnel: aircraftData[0].personnelCount,
-    commercialAirCost: aircraftData[0].commercialAirfareCost,
+    numOfAircraft: convertToNumber(aircraftData[0].aircraftCount),
+    numOfPersonnel: convertToNumber(aircraftData[0].personnelCount),
+    commercialAirCost: convertToNumber(aircraftData[0].commercialAirfareCost),
     lodgingCost:
-      aircraftData[0].commercialLodgingCost +
-      aircraftData[0].governmentLodgingCost,
+      convertToNumber(aircraftData[0].commercialLodgingCost) +
+      convertToNumber(aircraftData[0].governmentLodgingCost),
     mealsCost:
-      aircraftData[0].mealNotProvidedCount *
-      aircraftData[0].mealPerDiem *
+      convertToNumber(aircraftData[0].mealNotProvidedCount) *
+      convertToNumber(aircraftData[0].mealPerDiem) *
       totalDays,
-    rentalCarCount: aircraftData[0].rentalCount,
-    rentalCarCost: aircraftData[0].rentalCost,
-    totalCost: data.unitCostSum,
+    rentalCarCount: convertToNumber(aircraftData[0].rentalCount),
+    rentalCarCost: convertToNumber(aircraftData[0].rentalCost),
+    totalCost: convertToNumber(data.unitCostSum),
   };
+
+  // console.log("summaryData", summaryData);
   const totalCost =
     summaryData.commercialAirCost +
     summaryData.lodgingCost +

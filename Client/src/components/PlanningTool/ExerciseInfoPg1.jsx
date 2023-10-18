@@ -19,7 +19,7 @@ const generateExerciseLabels = (input) => {
     ? input.map((i) => {
         return {
           value: i.exerciseID,
-          label: i.exerciseName,
+          label: `${i.exerciseName} - ${i.location}`,
         };
       })
     : defaultLabelValues.exerciseLabels;

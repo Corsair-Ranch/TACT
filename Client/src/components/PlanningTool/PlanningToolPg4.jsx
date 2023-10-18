@@ -27,7 +27,40 @@ import { SaveButton } from "./save-button";
 //     long, 'January'
 //   }
 // }
+const AKperdiem = () => {
+  let months = [];
+  for (let i = 1; i <= 12; i++) {
+    months.push({ value: 193, number: i });
+  }
+  return [
+    {
+      city: "Standard Rate",
+      county: "Standard Rate",
+      meals: 97,
+      standardRate: "true",
+      zip: 11111,
+      months: { month: months },
+    },
+  ];
+};
 
+const HIperdiem = () => {
+  let months = [];
+  for (let i = 1; i <= 12; i++) {
+    months.push({ value: 229, number: i });
+  }
+
+  return [
+    {
+      city: "Standard Rate",
+      county: "Standard Rate",
+      meals: 126,
+      standardRate: "true",
+      zip: 11111,
+      months: { month: months },
+    },
+  ];
+};
 // Oconus perdiem data = []
 //   {
 //     "country": "ITALY",
@@ -49,8 +82,16 @@ const getPerDiem = async (params) => {
       return state.name === params.state;
     }).abbreviation;
     params.state = stateAbbv;
-    const response = await TactApi.getConus(params);
-    return response;
+    if (params.state === "AK") {
+      //TODO find the AK and HI per diem tables
+      return AKperdiem();
+    } else if (params.state === "HI") {
+      //TODO find the AK and HI per diem tables
+      return HIperdiem();
+    } else {
+      const response = await TactApi.getConus(params);
+      return response;
+    }
   } else {
     //get OCONUS perdiems
     const response = await TactApi.getOconus(params);

@@ -70,7 +70,7 @@ export const convertToCurrency = (input, decimals = 0) => {
 };
 
 export const dateToString = (date, formatTemplate = "dd LLL yyyy") => {
-  return DateTime.fromJSDate(date).toLocal().toUTC().toFormat(formatTemplate);
+  return DateTime.fromJSDate(date).toLocal().toFormat(formatTemplate);
 };
 
 export const calculateTotalDays = (start, stop) => {
