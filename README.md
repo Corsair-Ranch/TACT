@@ -66,16 +66,19 @@ docker-compose up db
 - Then open a new terminal window and run
 
 ```
-docker stop tact-server-1
+docker stop tact_server_1
 ```
 
-- If done properly run
+docker-compose up auth
+```
+
+- If done properly, in a new terminal window, run
 
 ```
 docker ps
 ```
 
-- There should only be the postgres container running.
+- There should only be the postgres and keycloak containers running.
 
 ### Next,
 
@@ -97,24 +100,3 @@ npm install pm2 -g
 
 > **Warning**
 > If you have a db_data_volume folder in the top directory you may need to remove it if you run into issues with the database not seeding properly, or other server issues.
-
-## Keycloak Local Config
-
-Keycloak is included as a Docker container, but the container does not save your user data so it needs to be recreated each time the container spins-up.  Until we find a way around it, it's recommended to spin-up a local version of the Keycloak container and leave it running instead of using "docker-compose up".  Here is the local command to keep this container running to avoid recreating users all the time (replace the X's with your home directory):
-
-docker run --name mykeycloak -p 8180:8180 \
-        -e KEYCLOAK_ADMIN=kcadmin -e KEYCLOAK_ADMIN_PASSWORD=kcpasswd \
-        -e KEYCLOAK_IMPORT=/opt/keycloak/data/import/ \
-        -v "/XXXXX/XXXXX/XXXXX/TACT/Client/keycloak-export":/opt/keycloak/data/import \
-        quay.io/keycloak/keycloak:latest \
-        start-dev --http-port=8180 --import-realm
-
-### Keycloak User Account Creation
-
-So as long as you run the Keycloak container locally and keep it running, you won't lose your users.  It's recommended to create a COCOM Planner user and at least one Wing Planner account.
-
-- Open the Keycloak Admin page (localhost:8180/admin) and login using the credentials from your Docker Run cmd.
-- Select the "TACT" realm in the dropdown (upper-left of the screen).
-- Click the "Users" menu option on the left.
-- Click "Add user", then enter a username and email, select "Email verified", then click "Join Groups" so your user can become a COCOM or Wing Planner; then click "Create".
-- Click the "Credentials" tab, then "Set password".  Set the password, and slide "Temporary" to be False, then click "Save".
