@@ -67,8 +67,6 @@ docker-compose up db
 
 ```
 docker stop tact_server_1
-```
-
 docker-compose up auth
 ```
 
