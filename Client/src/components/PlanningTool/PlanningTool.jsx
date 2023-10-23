@@ -47,6 +47,7 @@ const unitAircraftTemplate = {
   aircraftCount: 0,
   personnelCount: 0,
   commercialAirfareCost: 0,
+  commercialTicketCost: 0,
   commercialAirfareCount: 0,
   commercialLodgingCount: 0,
   commercialLodgingCost: 0,
@@ -60,6 +61,7 @@ const unitAircraftTemplate = {
   mealPerDiem: 0,
   rentalCount: 0,
   rentalCost: 0,
+  totalDays: 0,
 };
 
 function PlanningTool(props) {

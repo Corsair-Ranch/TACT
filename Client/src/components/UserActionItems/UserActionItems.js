@@ -50,7 +50,7 @@ const ActionObjectGeneral = [
     text: "Wing Planning Tool",
     link: NewPlanningTool,
   },
-  { text: "History", link: HistoryPage },
+  // { text: "History", link: HistoryPage },
 ];
 
 const UserActionItems = (props) => {

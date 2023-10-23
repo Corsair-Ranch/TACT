@@ -13,7 +13,7 @@ import Slider from "@mui/material/Slider";
 import MuiInput from "@mui/material/Input";
 import { styled } from "@mui/material/styles";
 import { TextField, Paper } from "@mui/material";
-import { convertToCurrency } from "./utils";
+import { convertToCurrency, convertToNumber } from "./utils";
 // styles
 import "../../styles/PlanningToolPg3.css";
 import { SaveButton } from "./save-button";
@@ -63,7 +63,7 @@ function PickAddOns(props) {
     } else {
       setFlightDisable(false);
     }
-    setFlightCost(aircraftData[0].commercialAirfareCost);
+    setFlightCost(aircraftData[0].commercialTicketCost);
   }, [aircraftData]);
 
   //need to figure out if airfare is going to be per plane or per unit, will change which table/context we use here
@@ -86,7 +86,14 @@ function PickAddOns(props) {
   const updateExerciseAircraft = (props) => {
     const { key, value } = props;
     const temp = aircraftData[0];
-    temp[key] = value;
+    if (key === "commercialTicketCost") {
+      temp.commercialTicketCost = convertToNumber(value, "float");
+      temp.commercialAirfareCost =
+        convertToNumber(value, "float") *
+        convertToNumber(aircraftData[0].commercialAirfareCount);
+    } else {
+      temp[key] = value;
+    }
     setAircraftData([temp]);
   };
 
@@ -100,7 +107,7 @@ function PickAddOns(props) {
   };
 
   const handleMilInputChange = (event) => {
-    const newValue = event.target.value;
+    const newValue = convertToNumber(event.target.value, "integer");
     updateExerciseAircraft({
       key: "commercialAirfareCount",
       value: data.personnelSum - newValue,
@@ -113,7 +120,7 @@ function PickAddOns(props) {
   };
 
   const handleComInputChange = (event) => {
-    const newValue = event.target.value;
+    const newValue = convertToNumber(event.target.value, "integer");
     updateExerciseAircraft({
       key: "commercialAirfareCount",
       value: newValue,

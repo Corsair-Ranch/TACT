@@ -70,11 +70,20 @@ export const convertToCurrency = (input, decimals = 0) => {
 };
 
 export const dateToString = (date, formatTemplate = "dd LLL yyyy") => {
-  return DateTime.fromJSDate(date).toLocal().toUTC().toFormat(formatTemplate);
+  return DateTime.fromJSDate(date).toLocal().toFormat(formatTemplate);
 };
 
 export const calculateTotalDays = (start, stop) => {
   return Math.round(
     1 + (new Date(stop) - new Date(start)) / (1000 * 60 * 60 * 24)
   );
+};
+
+export const convertToNumber = (input, type = "integer") => {
+  let result = input;
+  if (typeof input !== "number") {
+    if (type === "integer") result = parseInt(input);
+    if (type === "float") result = parseFloat(input);
+  }
+  return result;
 };

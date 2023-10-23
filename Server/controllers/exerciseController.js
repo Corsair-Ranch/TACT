@@ -325,6 +325,7 @@ const addExerciseAircraft = async (req, res) => {
     personnelCount,
     commercialAirfareCount,
     commercialAirfareCost,
+    commercialTicketCost,
     governmentAirfareCount,
     commercialLodgingCount,
     commercialLodgingCost,
@@ -337,6 +338,7 @@ const addExerciseAircraft = async (req, res) => {
     mealNotProvidedCount,
     rentalCount,
     rentalCost,
+    totalDays,
   } = req.body;
   knex("exerciseaircraft")
     .select("*")
@@ -354,6 +356,7 @@ const addExerciseAircraft = async (req, res) => {
               personnelCount: personnelCount,
               commercialAirfareCount: commercialAirfareCount,
               commercialAirfareCost: commercialAirfareCost,
+              commercialTicketCost: commercialTicketCost,
               governmentAirfareCount: governmentAirfareCount,
               commercialLodgingCount: commercialLodgingCount,
               commercialLodgingCost: commercialLodgingCost,
@@ -366,6 +369,7 @@ const addExerciseAircraft = async (req, res) => {
               mealNotProvidedCount: mealNotProvidedCount,
               rentalCount: rentalCount,
               rentalCost: rentalCost,
+              totalDays: totalDays,
             },
             "*"
           )
